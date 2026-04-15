@@ -1,0 +1,92 @@
+#!/bin/bash
+# Conventionnal commit hook validation
+
+commit_msg_file=$1
+commit_msg=$(cat "$commit_msg_file")
+
+# Couleurs
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+# Validation regex
+type_regex="^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)"
+header_regex="^${type_regex}(\([a-z0-9-]+\))?(!)?: [a-z].*$"
+
+#1 Ensure we are in a git repository
+if [ ! -d ".git" ]; then
+    echo -e "❌ This directory isn't a git repository."
+    exit 1
+fi
+
+# Header (first line)
+header=$(echo "$commit_msg" | head -n 1)
+
+#2 Ignore merge
+if echo "$header" | grep -qE "^Merge"; then
+    exit 0
+fi
+
+#3 Ignore revert
+if echo "$header" | grep -qE '^Revert "'; then
+    exit 0
+fi
+
+echo -e "${YELLOW}🔍 Validation...${NC}"
+
+#4 Check max length
+if [ ${#header} -gt 100 ]; then
+    echo -e "${RED}❌ Header > 100 characters (${#header})${NC}"
+    exit 1
+fi
+
+#5 Check header format
+if ! echo "$header" | grep -qE "$header_regex"; then
+    echo -e "${RED}❌ Invalid format${NC}"
+    echo -e "${YELLOW}Format: <type>(scope)?: <description>${NC}"
+    echo -e "${YELLOW}Types: build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test${NC}"
+    echo -e "${RED}Your Header: $header${NC}"
+    exit 1
+fi
+
+#6 Check lowcase policy in scope header part
+if echo "$header" | grep -qE '\([^)]+\)'; then
+    scope=$(echo "$header" | sed -E 's/^[^(]+\(([^)]+)\).*/\1/')
+    if echo "$scope" | grep -qE '[A-Z]'; then
+        echo -e "${RED}❌ The scope format is [a-z]${NC}"
+        exit 1
+    fi
+fi
+
+#7 Check lowcase policy in description header part
+description=$(echo "$header" | sed -E 's/^[^:]+: //')
+if [ -z "$description" ]; then
+    echo -e "${RED}❌ The description cannot be empty ${NC}"
+    exit 1
+fi
+if echo "$description" | grep -qE '^[A-Z]'; then
+    echo -e "${RED}❌ The description format is [a-z] ${NC}"
+    exit 1
+fi
+
+#8 Check footer/body length
+line_number=0
+while IFS= read -r line; do
+    line_number=$((line_number + 1))
+    if [ $line_number -gt 1 ] && [ -n "$line" ] && [ ${#line} -gt 100 ]; then
+        echo -e "${RED}❌ Line $line_number > 100 characters (${#line})${NC}"
+        exit 1
+    fi
+done <<< "$commit_msg"
+
+#9 BREAKING CHANGE check
+if echo "$header" | grep -qE '!:'; then
+    if ! echo "$commit_msg" | grep -qE '^BREAKING CHANGE:'; then
+        echo -e "${RED}❌ The '!' mark need a footer 'BREAKING CHANGE:'${NC}"
+        exit 1
+    fi
+fi
+
+echo -e "${GREEN}✅ Commit ok — type: $type${NC}"
+exit 0
