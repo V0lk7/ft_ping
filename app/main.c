@@ -77,9 +77,10 @@ int main(int argc, char **argv) {
   msg_hdr.msg_name = &sock_copy;
   msg_hdr.msg_namelen = sizeof(sock_copy);
 
-  char packet[64];
+  char packet[9];
   memset(packet, 0, sizeof(packet));
 
+  // icmphdr = 8bytes
   struct icmphdr *icmp_hdr = (struct icmphdr *)packet;
 
   icmp_hdr->type = ICMP_ECHO;
@@ -98,7 +99,7 @@ int main(int argc, char **argv) {
   msg_hdr.msg_iov = &iov;
   msg_hdr.msg_iovlen = 1;
 
-  int sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+  int sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
 
   if (sockfd < 0) {
     perror("socket");

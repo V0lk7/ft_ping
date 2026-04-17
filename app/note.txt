@@ -176,6 +176,58 @@ Family: 10      Type: 1 Protocole: 6
 Family: 10      Type: 2 Protocole: 17
 Family: 10      Type: 3 Protocole: 0
 
+IPPROTO_IP -> User set IP header
+IPPROTO_ICMP -> kernel set IP header
+socket(AF_INET, SOCK_DGRAM|SOCK_NONBLOCK, IPPROTO_ICMP)
+
+/usr/include/netinet/ip_icmp.h
+struct icmphdr
+{
+  uint8_t type;		/* message type */
+  uint8_t code;		/* type sub-code */
+  uint16_t checksum;
+  union
+  {
+    struct
+    {
+      uint16_t	id;
+      uint16_t	sequence;
+    } echo;			/* echo datagram */
+    uint32_t	gateway;	/* gateway address */
+    struct
+    {
+      uint16_t	__glibc_reserved;
+      uint16_t	mtu;
+    } frag;			/* path mtu discovery */
+  } un;
+};
+sizeof icmphdr = 
+
+/usr/include/netinet/ip.h
+struct iphdr
+  {
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+    unsigned int ihl:4;
+    unsigned int version:4;
+#elif __BYTE_ORDER == __BIG_ENDIAN
+    unsigned int version:4;
+    unsigned int ihl:4;
+#else
+# error	"Please fix <bits/endian.h>"
+#endif
+    uint8_t tos;
+    uint16_t tot_len;
+    uint16_t id;
+    uint16_t frag_off;
+    uint8_t ttl;
+    uint8_t protocol;
+    uint16_t check;
+    uint32_t saddr;
+    uint32_t daddr;
+    /*The options start here. */
+  };
+  20bytes
+
 -------------------------------------------------------------------------------
 https://www.rfc-editor.org/rfc/rfc792
 Echo or Echo Reply Message
@@ -234,3 +286,56 @@ Description
     in the echo reply.
 
     Code 0 may be received from a gateway or a host.
+
+[IP Header - 20Bytes]   [Payload]
+        ____________________|
+        |
+        V
+[ICMP Header - 8Bytes] [Payload]
+        ____________________|
+        |
+        V
+[stuct timeval 16Bytes][Rest (default: 40Bytes)]
+
+for the while loop
+use a volatile int in the while
+
+in code like this
+int i = 0;
+while (i == 0) {
+    ...
+}
+
+if i isn't modified into the while loop, compiler can 
+optimize it to "true"
+So volatile will tell -> don't optimize this variable 
+really usefull when i is modified in signal handler
+
+
+CREATE an executable tool which recv ICMP package on 127.0.0.1 and send 
+corrupt response
+nothing -> loss package
+echo reply
+address reply
+timestamp reply
+
+-------------------------------------------------------------------------------
+Sur quoi joue les options de ping ?
+
+
+* "Controling ICMP Request type"
+--address       send ICMP_ADDRESS packets (root only ?) |   ICMP_ADDRESS 17         V
+--echo(default) send ICMP_ECHO packets (default)        |   ICMP_ECHO 8             V
+--mask          same as --address                       |   ICMP_ADDRESS 17         V
+--timestamp     send ICMP_TIMESTAMP packets             |   ICMP_TIMESTAMP  13      V
+-t, --type=TYPE send TYPE packets                       |   TYPE                    V
+
+ok donc ping de inetutils gere 3 type de requete
+- "echo" (default, le basique)
+- "address"
+- "timestamp"
+
+
+*"Options valid for all request types"
+RUNTIME
+-c --cont=NUMBER
