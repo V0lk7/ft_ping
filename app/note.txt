@@ -228,6 +228,9 @@ struct iphdr
   };
   20bytes
 
+
+  hop hop hop pas oublier time.h
+
 -------------------------------------------------------------------------------
 https://www.rfc-editor.org/rfc/rfc792
 Echo or Echo Reply Message
@@ -312,12 +315,15 @@ So volatile will tell -> don't optimize this variable
 really usefull when i is modified in signal handler
 
 
-CREATE an executable tool which recv ICMP package on 127.0.0.1 and send 
-corrupt response
-nothing -> loss package
-echo reply
-address reply
-timestamp reply
+Ping response:
+- Destination Unreachable Message [Type 3] [Code: 0, 1, 2, 3, 4, 5]
+- Source Quench Message [Type 4] {deprecated RFC 6633}
+- Redirect Message [Type 5] [Code 0, 1, 2, 3]
+- Time Exceeded Message [Type 11] [Code: 0, 1]
+- Parameter Problem Message [Type 12] [Code 0]
+- Echo Reply Message [Type 0] [Code 0]
+- Timestamp Reply Message [Type 14] [Code 0]
+- Information Reply Message [16] {deprecated RFC 6918}
 
 -------------------------------------------------------------------------------
 Sur quoi joue les options de ping ?
@@ -339,3 +345,33 @@ ok donc ping de inetutils gere 3 type de requete
 *"Options valid for all request types"
 RUNTIME
 -c --cont=NUMBER
+
+
+sudo sysctl -w net.ipv4.icmp_echo_ignore_all=1
+[sudo] Mot de passe de jduval : 
+net.ipv4.icmp_echo_ignore_all = 1
+
+
+----------------------------------------------------------------------------------------------
+chaque ligne correspond a 16 Bytes
+
+
+13:16:31.441538 lo    In  IP localhost > localhost: ICMP echo request, id 4, seq 0, length 64
+        0x0000:  4500 0054 c4dd 4000 4001 77c9 7f00 0001  E..T..@.@.w.....
+        0x0010:  7f00 0001 0800 c695 0004 0000 0fae e869  ...............i
+        0x0020:  0000 0000 b5bc 0600 0000 0000 0001 0203  ................
+        0x0030:  0405 0607 0809 0a0b 0c0d 0e0f 1011 1213  ................
+        0x0040:  1415 1617 1819 1a1b 1c1d 1e1f 2021 2223  .............!"#
+        0x0050:  2425 2627                                $%&'
+13:16:31.441545 lo    In  IP localhost > localhost: ICMP echo reply, id 4, seq 0, length 64
+        0x0000:  4500 0054 c4de 0000 4001 b7c8 7f00 0001  E..T....@.......
+        0x0010:  7f00 0001 0000 ce95 0004 0000 0fae e869  ...............i
+        0x0020:  0000 0000 b5bc 0600 0000 0000 0001 0203  ................
+        0x0030:  0405 0607 0809 0a0b 0c0d 0e0f 1011 1213  ................
+        0x0040:  1415 1617 1819 1a1b 1c1d 1e1f 2021 2223  .............!"#
+        0x0050:  2425 2627
+
+0x0000 - 0x0001: [4500] -> [0001] => IP Header
+0x0001 - 0x0001: [0800] -> [0000] => ICMP Header
+0x0001 - 0x0050: [0fae] -> [2627] => Payload
+----------------------------------------------------------------------------------------------
