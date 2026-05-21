@@ -375,3 +375,16 @@ chaque ligne correspond a 16 Bytes
 0x0001 - 0x0001: [0800] -> [0000] => ICMP Header
 0x0001 - 0x0050: [0fae] -> [2627] => Payload
 ----------------------------------------------------------------------------------------------
+
+
+
+OK OK Grosse étapes à faire
+
+// 0. Validate input
+1. Creer la socket icmp
+2. Creer le packet icmp
+3. Envoyer la requête icmp
+4. Ecouter si la socket est prête à être lu 
+5. Lire ce qu'il y à sur la socket
+6. Ecrire sur la sortie standard
+7. Refaire 2.

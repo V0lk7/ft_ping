@@ -35,9 +35,14 @@ DIRDUP =  mkdir -p $(@D)
 
 #####################################################################
 
-INCLUDES = $(INCLUDE_DIR)/tmp.h
+INCLUDES =	\
+			$(INCLUDE_DIR)/utils.h \
+			$(INCLUDE_DIR)/icmp.h
 
-SRC = $(SRC_DIR)/tmp.c
+SRC =	\
+		$(SRC_DIR)/utils.c \
+		$(SRC_DIR)/icmp.c
+
 ifndef TEST
 SRC += app/main.c
 endif
