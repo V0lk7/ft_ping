@@ -37,11 +37,11 @@ DIRDUP =  mkdir -p $(@D)
 
 INCLUDES =	\
 			$(INCLUDE_DIR)/utils.h \
-			$(INCLUDE_DIR)/icmp.h
+			$(INCLUDE_DIR)/icmp_utils.h
 
 SRC =	\
 		$(SRC_DIR)/utils.c \
-		$(SRC_DIR)/icmp.c
+		$(SRC_DIR)/icmp_utils.c
 
 ifndef TEST
 SRC += app/main.c

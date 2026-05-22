@@ -1,5 +1,5 @@
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef ICMP_UTILS_H
+#define ICMP_UTILS_H
 
 #include <stddef.h>
 #include <stdint.h>

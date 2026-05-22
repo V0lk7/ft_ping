@@ -1,11 +1,9 @@
-#include "icmp.h"
+#include "icmp_utils.h"
+#include "utils.h"
 
 #include <netinet/ip_icmp.h>
-#include <stdint.h>
 #include <string.h>
 #include <unistd.h>
-
-static uint16_t checksum(void *addr, size_t len);
 
 int icmp_create_packet(uint8_t *packet, size_t packet_size,
                        const struct icmp_infos *infos) {
@@ -29,22 +27,7 @@ int icmp_create_packet(uint8_t *packet, size_t packet_size,
   (void)memcpy(packet + s_icmphdr_size, infos->payload, infos->payload_size);
 
   ((struct icmphdr *)packet)->checksum =
-      checksum(packet, s_icmphdr_size + infos->payload_size);
+      _checksum(packet, s_icmphdr_size + infos->payload_size);
 
   return 0;
-}
-
-static uint16_t checksum(void *addr, size_t len) {
-  uint16_t *word = addr;
-  uint32_t result = 0;
-  for (size_t i = 0; i < len / sizeof(uint16_t); i++) {
-    result += *(word + i);
-  }
-  if (len % 2 == 1) {
-    result += *((uint8_t *)addr + len - 1);
-  }
-  result = (result >> 16) + (result & 0xffff);
-  // Carry the previous add.
-  result = (result >> 16) + (result & 0xffff);
-  return ~result;
 }
