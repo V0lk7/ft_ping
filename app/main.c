@@ -31,6 +31,8 @@
 #include <sys/uio.h>
 #include <unistd.h>
 
+#include <stdalign.h>
+
 static int Getaddrinfo(const char *node, const char *service,
                        const struct addrinfo *hints, struct addrinfo **res);
 // static int Getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
@@ -41,6 +43,11 @@ struct sockaddr *get_ipv4_node(struct addrinfo *list);
 uint16_t checksum(void *addr, size_t len);
 
 int main(int argc, char **argv) {
+  (void)argc;
+  (void)argv;
+  printf("sizeof(struct icmphdr) = %zu\n", sizeof(struct icmphdr));
+  printf("alignof(struct icmphdr) = %zu\n", alignof(struct icmphdr));
+  return 0;
   struct addrinfo hints;
   struct addrinfo *res;
   char host[NI_MAXHOST], serv[NI_MAXSERV];

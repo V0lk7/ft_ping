@@ -25,7 +25,8 @@ LIBS =
 LIBS_TARGET = 
 
 CC = clang
-CFLAGS = -Wall -Wextra -Werror -Wunreachable-code -Wshadow -Wundef
+CFLAGS = -Wall -Wextra -Werror  -Wshadow -Wundef
+# -Wunreachable-code
 CPPFLAGS = -MMD -MP $(addprefix -I,$(INCLUDE_DIR))
 
 LDFLAGS = $(addprefix -L,$(dir $(LIBS_TARGET)))

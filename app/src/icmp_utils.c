@@ -1,33 +1,30 @@
 #include "icmp_utils.h"
 #include "utils.h"
 
-#include <netinet/ip_icmp.h>
+#include <stdint.h>
 #include <string.h>
 #include <unistd.h>
 
 int icmp_create_packet(uint8_t *packet, size_t packet_size,
                        const struct icmp_infos *infos) {
 
-  // Check if packet can contain the icmp header and the payload
-  static size_t s_icmphdr_size = sizeof(struct icmphdr);
-
-  if (packet_size < (s_icmphdr_size + infos->payload_size)) {
+  if (packet_size < (ICMP_HEADER_SIZE + infos->payload_size)) {
     return 1;
   }
+  uint16_t id = htons(getpid());
+  uint16_t seq = htons(0);
 
-  struct icmphdr header;
+  packet[ICMP_OFFSET_TYPE] = infos->type;
+  packet[ICMP_OFFSET_CODE] = infos->code;
+  packet[ICMP_OFFSET_CHECKSUM] = 0;
 
-  header.type = infos->type;
-  header.code = infos->code;
-  header.checksum = 0;
-  header.un.echo.id = htons(getpid());
-  header.un.echo.sequence = 0;
+  memcpy(packet + ICMP_OFFSET_IDENTIFIER, &id, sizeof(uint16_t));
+  memcpy(packet + ICMP_OFFSET_SEQUENCE_NUMBER, &seq, sizeof(uint16_t));
 
-  (void)memcpy(packet, &header, s_icmphdr_size);
-  (void)memcpy(packet + s_icmphdr_size, infos->payload, infos->payload_size);
+  memcpy(packet + ICMP_HEADER_SIZE, infos->payload, infos->payload_size);
 
-  ((struct icmphdr *)packet)->checksum =
-      _checksum(packet, s_icmphdr_size + infos->payload_size);
+  uint16_t checksum = _checksum(packet, ICMP_HEADER_SIZE + infos->payload_size);
+  memcpy(packet + ICMP_OFFSET_CHECKSUM, &checksum, sizeof(uint16_t));
 
   return 0;
 }
