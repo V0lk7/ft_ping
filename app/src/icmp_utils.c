@@ -8,9 +8,9 @@
 int icmp_create_packet(uint8_t *packet, size_t packet_size,
                        const struct icmp_infos *infos) {
 
-  if (packet_size < (ICMP_HEADER_SIZE + infos->payload_size)) {
+  if (packet_size < (ICMP_HEADER_SIZE + infos->payload_size))
     return 1;
-  }
+
   uint16_t id = htons(getpid());
   uint16_t seq = htons(0);
 

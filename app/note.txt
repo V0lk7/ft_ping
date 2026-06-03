@@ -430,3 +430,13 @@ struct ip
   };
 
 Total 20 Bytes
+
+ip header = 20 Bytes
+icmp header = 8 Bytes
+size max of the packet 0 <= val <= 65507
+
+total = 65535 -> max ip packet
+
+ip header non compté
+standard total = 64Bytes - icmp header
+= 56 Bytes standard packet
