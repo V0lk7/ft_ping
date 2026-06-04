@@ -11,7 +11,7 @@ int icmp_create_packet(uint8_t *packet, size_t packet_size,
   if (packet_size < (ICMP_HEADER_SIZE + infos->payload_size))
     return 1;
 
-  uint16_t id = htons(getpid());
+  uint16_t id = htons((uint16_t)getpid());
   uint16_t seq = htons(0);
 
   packet[ICMP_OFFSET_TYPE] = infos->type;
