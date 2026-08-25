@@ -57,11 +57,11 @@ all: $(NAME)
 release: all
 .PHONY: release
  
-debug: CFLAGS += -gdwarf-5 -ggdb3 -DDEBUG
+debug: CFLAGS += -gdwarf-4 -ggdb3 -DDEBUG
 debug: $(NAME)
 .PHONY: debug
 
-_test: CFLAGS += -gdwarf-5 -ggdb3 --coverage
+_test: CFLAGS += -gdwarf-4 -ggdb3 --coverage
 _test: CPPFLAGS += -I $(TEST_DIR)
 _test: $(TEST_NAME)
 .PHONY: _test
