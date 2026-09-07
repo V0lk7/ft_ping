@@ -1,0 +1,25 @@
+
+# <type>(scope)?: <description>
+# 
+# [optional body]
+# 
+# [optional footer(s)]
+#
+# ──────────────────────────────────────────────
+# TYPES: build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test
+# SCOPE: optionnal, lowcase (ex: api, auth)
+# !: BREAKING CHANGE (need a footer)
+# 
+# RULES:
+# - Header max 100 characters
+# - Type/scope/description in lowercase
+# - Description in present tense
+# - Body/footer max 100 characters/line
+#
+# EXAMPLES:
+# feat(api): add user authentication
+# fix: correct validation error
+# fix!: remove deprecated endpoint
+# feat(auth)!: replace JWT with OAuth2
+#
+# BREAKING CHANGE: removed old api
